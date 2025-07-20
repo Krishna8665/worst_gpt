@@ -9,15 +9,18 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string; email: string };
-    const user = await User.findById(decoded.id);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { _id: string, email: string };
+    console.log('Decoded token:', decoded);
+
+    const user = await User.findById(decoded._id); 
+
     if (!user) {
       return res.status(401).json({ message: 'Unauthorized: User not found' });
     }
 
     req.user = {
-      _id: user.id, 
-      email: user.email,
+      _id: user._id.toString(),
+      email: user.email
     };
 
     next();

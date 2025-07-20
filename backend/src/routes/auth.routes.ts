@@ -13,7 +13,7 @@ router.post('/logout', logout);
 
 // Landing route (for testing)
 router.get("/", (req, res) => {
-  res.send("<a href='/auth/google'>Login with Google</a>");
+  res.send("<a href='/api/auth/google'>Login with Google</a>");
 });
 
 // Google OAuth Routes
@@ -21,30 +21,39 @@ router.get('/google', passport.authenticate('google', {
   scope: ['profile', 'email'],
 }));
 
-router.get(
-  '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    res.redirect('/auth/profile');
-  }
-);
-
 // Protected route
 router.get('/profile', (req, res) => {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
-    return res.redirect('/');
+    return res.redirect('/api/auth/');
   }
   const user = req.user as any;
   res.send(`Welcome Respected ${user.username}`);
 });
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    res.redirect('/api/auth/profile');
+  }
+);
 
-//Logout route (can be POST or GET)
+
+
+// Logout route (GET or POST)
 router.get('/logout', (req, res, next) => {
-  req.logout(() => {
-    
-    res.redirect('/auth/'); 
+  req.logout((err) => {
+    if (err) return next(err);
+
+    // Destroy session completely
+    req.session.destroy((err) => {
+      if (err) return next(err);
+
+      res.clearCookie('connect.sid'); // Only if you're using express-session
+      res.redirect('/api/auth'); // or wherever you want to redirect after logout
+    });
   });
 });
+
 
 
 

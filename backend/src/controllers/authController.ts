@@ -37,12 +37,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
 //  Freemium credits initialized here
 await initUserUsage(user.id.toString());
 
-  const token = jwt.sign(
-    { email: user.email, _id: user._id },
-    envConfig.JWT_SECRET as string,
-    { expiresIn: "1h" }
-  );
-
+  
   res.status(201).json({ message: "User registered successfully!" });
 };
 
@@ -80,7 +75,7 @@ await initUserUsage(user.id);
 
     // Generate JWT token
     const token = jwt.sign(
-      { email: user.email, _id: user._id },
+      { email: user.email, _id: user._id.toString() },
       envConfig.JWT_SECRET as string,
       { expiresIn: "1h" }
     );

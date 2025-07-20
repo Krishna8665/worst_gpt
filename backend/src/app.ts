@@ -4,28 +4,37 @@ import cookieParser from 'cookie-parser';
 import passport from "passport";
 import './config/passport';
 import session from 'express-session';
-import routes from "../src/routes/index"
-
-import router from "./routes/auth.routes";
-
-
-
+import routes from "./routes/index";  // Fixed import path
+import cors from 'cors';
 
 const app = express();
-app.use(session({
-  secret: 'your-secret',
-  resave: false,
-  saveUninitialized: true,
+
+// Middleware
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',  // Added CORS configuration
+  credentials: true
 }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'fallback-secret',  // Added fallback secret
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',  // Secure cookies in production
+      maxAge: 24 * 60 * 60 * 1000  // 1 day
+    }
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.json());
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
 
+// Routes
 app.use('/api', routes);
 
+// Error handler (must be last middleware)
 app.use(globalErrorHandler);
-
 
 export default app;
