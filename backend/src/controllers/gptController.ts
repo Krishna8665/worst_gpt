@@ -38,8 +38,14 @@ export const handleGptQuery = async (req: Request, res: Response) => {
       await usage.save();
     }
 
+    
     const sarcasticReply = `WorstGPT: "${prompt}"? Wow, that's... impressively incorrect. You're on fire. 🔥`;
-    res.status(200).json({ response: sarcasticReply });
+    res.status(200).json({ 
+      response: sarcasticReply,
+      tokensUsed,
+      remainingCredits: usage.isPremium ? '∞' : usage.credits
+     });
+
   } catch (error) {
     console.error('GPT handler error:', error);
     res.status(500).json({ message: 'Server error.' });
