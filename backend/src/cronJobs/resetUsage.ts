@@ -11,7 +11,7 @@ cron.schedule('0 0 * * *', async () => {
 
     const usersToReset = await Usage.find({
       resetDate: { $lte: now },
-      isPremium: false // Optional: skip premium users if they have unlimited use
+      isPremium: false //  skip premium users if they have unlimited use
     });
 
     for (const usage of usersToReset) {
