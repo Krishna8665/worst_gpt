@@ -20,6 +20,14 @@ cron.schedule('0 0 * * *', async () => {
       await usage.save();
       console.log(`✅ Reset usage for user ${usage.userId}`);
     }
+    
+
+
+
+
+
+
+
   } catch (error) {
     console.error('❌ Error running usage reset cron job:', error);
   }
