@@ -6,6 +6,9 @@ import './config/passport';
 import session from 'express-session';
 import routes from "./routes/index";  // Fixed import path
 import cors from 'cors';
+// app.ts or index.ts
+import './cronJobs/resetUsage'; 
+
 
 const app = express();
 

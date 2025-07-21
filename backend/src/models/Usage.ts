@@ -1,8 +1,7 @@
-import mongoose, { Document, Schema, Types } from 'mongoose';
+import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface IUsage extends Document {
-  userId: Types.ObjectId; 
-  
+  userId: Types.ObjectId;
   credits: number;
   resetDate: Date;
   isPremium: boolean;
@@ -11,11 +10,10 @@ export interface IUsage extends Document {
 const usageSchema = new Schema<IUsage>({
   userId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
-  
-  
+
   credits: {
     type: Number,
     required: true,
@@ -32,4 +30,4 @@ const usageSchema = new Schema<IUsage>({
   },
 });
 
-export default mongoose.model<IUsage>('Usage', usageSchema);
+export default mongoose.model<IUsage>("Usage", usageSchema);
