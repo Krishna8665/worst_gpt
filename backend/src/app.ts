@@ -8,6 +8,8 @@ import routes from "./routes/index";  // Fixed import path
 import cors from 'cors';
 // app.ts or index.ts
 import './cronJobs/resetUsage'; 
+import { rateLimiter } from './middlewares/rateLimiters';
+
 
 
 const app = express();
@@ -19,6 +21,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(rateLimiter); // Applies to all incoming requests
 app.use(cookieParser());
 app.use(
   session({
