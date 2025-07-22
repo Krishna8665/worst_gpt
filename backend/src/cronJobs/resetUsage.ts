@@ -1,17 +1,17 @@
 // cronJobs/resetUsage.ts
-import cron from 'node-cron';
-import Usage from '../models/Usage';
+import cron from "node-cron";
+import Usage from "../models/Usage";
 
 // Runs every day at midnight (00:00)
-cron.schedule('0 0 * * *', async () => {
+cron.schedule("0 0 * * *", async () => {
   try {
-    console.log('⏰ Running daily usage reset check');
+    console.log("⏰ Running daily usage reset check");
 
     const now = new Date();
 
     const usersToReset = await Usage.find({
       resetDate: { $lte: now },
-      isPremium: false //  skip premium users if they have unlimited use
+      isPremium: false, //  skip premium users if they have unlimited use
     });
 
     for (const usage of usersToReset) {
@@ -20,15 +20,7 @@ cron.schedule('0 0 * * *', async () => {
       await usage.save();
       console.log(`✅ Reset usage for user ${usage.userId}`);
     }
-    
-
-
-
-
-
-
-
   } catch (error) {
-    console.error('❌ Error running usage reset cron job:', error);
+    console.error("❌ Error running usage reset cron job:", error);
   }
 });

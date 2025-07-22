@@ -1,9 +1,9 @@
 // backend/config/passport.ts
-import passport from 'passport';
-import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
-import User, { IUser } from '../models/User';
-import dotenv from 'dotenv';
-import { initUserUsage } from '../utils/initUserUsage';
+import passport from "passport";
+import { Strategy as GoogleStrategy, Profile } from "passport-google-oauth20";
+import User, { IUser } from "../models/User";
+import dotenv from "dotenv";
+import { initUserUsage } from "../utils/initUserUsage";
 
 dotenv.config();
 
@@ -12,7 +12,9 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:4000/api/auth/google/callback',
+      callbackURL:
+        process.env.GOOGLE_CALLBACK_URL ||
+        "http://localhost:4000/api/auth/google/callback",
     },
     async (
       accessToken: string,
@@ -31,16 +33,15 @@ passport.use(
         // Create new user with googleId (password not required here)
         const newUser = await User.create({
           username: profile.displayName,
-          email: profile.emails?.[0]?.value || '',
+          email: profile.emails?.[0]?.value || "",
           googleId: profile.id,
           // password is NOT required for Google OAuth users
         });
         await initUserUsage(newUser.id); // ✅ create Usage record
-        
 
         return done(null, newUser);
       } catch (error) {
-        console.error('Google Strategy Error:', error);
+        console.error("Google Strategy Error:", error);
         return done(error);
       }
     }
@@ -56,7 +57,7 @@ passport.serializeUser((user: any, done) => {
 passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await User.findById(id);
-    if (!user) return done(new Error('User not found'));
+    if (!user) return done(new Error("User not found"));
     done(null, user);
   } catch (error) {
     done(error);

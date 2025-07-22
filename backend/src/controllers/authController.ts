@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import envConfig from "../config/config";
-import { initUserUsage } from '../utils/initUserUsage';
+import { initUserUsage } from "../utils/initUserUsage";
 import { Types } from "mongoose";
 
 dotenv.config();
@@ -26,18 +26,16 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = new User({ username, email, password: hashedPassword });
-     await user.save();
-//   await User.create({
-//     username: username,
-//     email: email,
-//     password: password,
-//   });
+  await user.save();
+  //   await User.create({
+  //     username: username,
+  //     email: email,
+  //     password: password,
+  //   });
 
+  //  Freemium credits initialized here
+  await initUserUsage(user.id.toString());
 
-//  Freemium credits initialized here
-await initUserUsage(user.id.toString());
-
-  
   res.status(201).json({ message: "User registered successfully!" });
 };
 
@@ -54,24 +52,23 @@ const login = async (req: Request, res: Response): Promise<any> => {
 
     // Check if user exists
     const user = await User.findOne({ email });
-    console.log(user)
+    console.log(user);
     if (!user) {
       return res.status(400).json({ message: "User not found!" });
     }
 
     // Compare passwords
-   if (!user || !user.password) {
-  return res.status(400).json({ message: "Invalid credentials!" });
-}
+    if (!user || !user.password) {
+      return res.status(400).json({ message: "Invalid credentials!" });
+    }
 
-const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
-if (!isMatch) {
-  return res.status(400).json({ message: "Invalid credentials!" });
-}
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials!" });
+    }
 
-await initUserUsage(user.id);
-
+    await initUserUsage(user.id);
 
     // Generate JWT token
     const token = jwt.sign(

@@ -1,5 +1,5 @@
 // src/models/User.ts
-import mongoose, { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from "mongoose";
 
 export interface IUser {
   _id: mongoose.Types.ObjectId;
@@ -44,7 +44,6 @@ export default mongoose.model<IUser>("User", UserSchema);
 //   },
 //   googleId: { type: String, required: false }, // ✅ add this
 
- 
 // });
 
 // export default mongoose.model<IUser>("User", UserSchema);

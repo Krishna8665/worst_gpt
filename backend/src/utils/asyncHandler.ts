@@ -1,5 +1,5 @@
 // src/utils/asyncHandler.ts
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
 
 type AsyncHandler = (
   req: Request,
