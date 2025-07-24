@@ -76,12 +76,12 @@ export default function Home() {
                     </div>
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
-                      D
+                      W
                     </div>
                   )}
                   <div className="flex-1">
                     <div className="font-medium mb-1">
-                      {msg.from === "user" ? "You" : "DeepSeek"}
+                      {msg.from === "user" ? "You" : "WorstGPT"}
                     </div>
                     <div className="whitespace-pre-wrap">{msg.text}</div>
                   </div>
