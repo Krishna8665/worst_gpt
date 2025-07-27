@@ -1,6 +1,7 @@
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Pricing from "../components/Pricing";
+import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
@@ -14,12 +15,13 @@ export default function LandingPage() {
           WorstGPT is the chatbot that tells it like it is — brutally,
           sarcastically, and without any emotional support.
         </p>
-        <a
-          href="/chat"
+
+        <Link
+          to={"/home"}
           className="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
         >
           Chat with WorstGPT
-        </a>
+        </Link>
       </section>
 
       {/* Features */}
@@ -33,7 +35,7 @@ export default function LandingPage() {
               Painfully Honest Replies
             </h3>
             <p>
-              We don’t sugarcoat anything. We coat it in sarcasm and throw it
+              We don't sugarcoat anything. We coat it in sarcasm and throw it
               back.
             </p>
           </div>

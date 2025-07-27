@@ -52,12 +52,14 @@ export const handleGptQuery = async (req: Request, res: Response) => {
         messages: [{ role: "user", content: prompt }],
         max_tokens: 1024,
       },
+
       {
         headers: {
           Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
         },
       }
     );
+    console.log(deepseekResponse)
 
     console.log("🔑 API Key:", process.env.DEEPSEEK_API_KEY);
     type DeepseekChatResponse = {

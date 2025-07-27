@@ -30,9 +30,8 @@ export default function Home() {
 
   const generateResponse = (query) => {
     // Simulate a more comprehensive search-like response
-    return `Here’s your nonsense on "${query}":\n\n1. First result related to ${query}\n2. Second source discussing ${query}\n3. Additional information about ${query}`;
+    return `Here’s your nonsense on "${query}":\n\n1.  ${query}\n2.  ${query}\n3.  ${query}`;
   };
-
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {

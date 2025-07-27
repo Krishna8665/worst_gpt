@@ -4,6 +4,7 @@ import About from "./assets/pages/About";
 import Landing from "./assets/pages/Landing";
 import Signup from "./assets/pages/Signup";
 import Login from "./assets/pages/Login";
+import Price from "./assets/pages/Price";
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/price" element={<Price />} />
       </Routes>
     </BrowserRouter>
   );
