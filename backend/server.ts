@@ -3,7 +3,7 @@ import envConfig from "./src/config/config";
 import connectToDatabase from "./src/config/db";
 import router from "./src/routes/auth.routes";
 
-const MainRouter = require("./src/routes");
+//const MainRouter = require("./src/routes");
 
 const startServer = async () => {
   await connectToDatabase();

@@ -5,12 +5,15 @@ import Landing from "./assets/pages/Landing";
 import Signup from "./assets/pages/Signup";
 import Login from "./assets/pages/Login";
 import Price from "./assets/pages/Price";
+import store from "./assets/store/store";
+import { Provider } from "react-redux";
 
 function App() {
 
 
   return (
-    <BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/home" element={<Home />} />
@@ -20,6 +23,7 @@ function App() {
         <Route path="/price" element={<Price />} />
       </Routes>
     </BrowserRouter>
+    </Provider>
   );
 }
 

@@ -2,7 +2,7 @@
 @tailwind utilities;
 
 
-
-html, body {
+html,
+body {
   @apply transition-colors duration-500;
 }

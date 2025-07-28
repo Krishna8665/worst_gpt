@@ -1,39 +1,34 @@
-import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser, Status } from "../store/authSlice";
 
 export default function Signup() {
-  const [form, setForm] = useState({ email: "", password: "", username: "" });
-  const [error, setError] = useState("");
+  const { status, error } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const [data, setData] = useState({ username: "", email: "", password: "" });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError("");
+    dispatch(registerUser(data));
+  };
 
-    try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || "Something went wrong");
-      navigate("/chat");
-    } catch (err) {
-      setError(err.message);
+  useEffect(() => {
+    console.log("current status", status);
+    if (status === Status.SUCCESS) {
+      navigate("/login");
     }
-  };
-
-  const handleGoogleSignup = () => {
-    window.location.href = "/api/auth/google";
-  };
+    // Removed alert on error to show error from Redux state in UI
+  }, [status, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -42,23 +37,27 @@ export default function Signup() {
           Sign up for WorstGPT
         </h2>
 
-        {error && (
+        {/* Show error message from Redux */}
+        {status === Status.ERROR && error && (
           <div className="bg-red-100 text-red-600 p-3 mb-4 rounded text-sm">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5" method="POST">
           {/* Username */}
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Username
             </label>
             <input
               id="username"
               name="username"
               type="text"
-              value={form.username}
+              value={data.username}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
               required
@@ -67,14 +66,17 @@ export default function Signup() {
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Email
             </label>
             <input
               id="email"
               name="email"
               type="email"
-              value={form.email}
+              value={data.email}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
               required
@@ -83,14 +85,17 @@ export default function Signup() {
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Password
             </label>
             <input
               id="password"
               name="password"
               type="password"
-              value={form.password}
+              value={data.password}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
               required
@@ -110,15 +115,6 @@ export default function Signup() {
         <div className="my-6 flex items-center justify-center text-sm text-gray-500">
           <span className="mx-2">— or —</span>
         </div>
-
-        {/* Google Signup */}
-        <button
-          onClick={handleGoogleSignup}
-          className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded-lg hover:bg-gray-100 transition text-gray-800 font-medium"
-        >
-          <FcGoogle size={20} />
-          Sign up with Google
-        </button>
 
         {/* Footer link */}
         <p className="text-sm text-center mt-6 text-gray-600">
