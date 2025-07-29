@@ -85,7 +85,10 @@ const login = async (req: Request, res: Response): Promise<any> => {
       sameSite: "strict", // Strict CSRF protection
     });
 
-    res.status(200).json({ message: "Login successful!" });
+    res.status(200).json({ 
+      message: "Login successful!",
+      token,
+     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error, please try again." });

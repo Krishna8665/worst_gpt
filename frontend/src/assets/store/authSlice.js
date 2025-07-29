@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Optional: Create a simple enum or object for statuses
 export const Status = {
   IDLE: "idle",
   SUCCESS: "success",
@@ -10,13 +9,10 @@ export const Status = {
 };
 
 const initialState = {
-  user: {
-    username: null,
-    email: null,
-    password: null,
-  },
+  user: null, // null means not logged in
+  token: null,
   status: Status.IDLE,
-  error:null,
+  error: null,
 };
 
 const authSlice = createSlice({
@@ -26,56 +22,100 @@ const authSlice = createSlice({
     setUser(state, action) {
       state.user = action.payload;
     },
+    setToken(state, action) {
+      state.token = action.payload;
+    },
     setStatus(state, action) {
       state.status = action.payload;
     },
     setError(state, action) {
       state.error = action.payload;
     },
+    resetStatus(state) {
+      state.status = Status.IDLE;
+      state.error = null;
+    },
+    logout(state) {
+      state.user = null;
+      state.token = null;
+      state.status = Status.IDLE;
+      state.error = null;
+      localStorage.removeItem("tokenHoYo");
+    },
   },
 });
 
-export const { setUser, setStatus, setError } = authSlice.actions;
+export const {
+  setUser,
+  setToken,
+  setStatus,
+  setError,
+  resetStatus,
+  logout,
+} = authSlice.actions;
+
 export default authSlice.reducer;
 
-// Thunk to register a user
+// Thunk to register a user (no token set on register)
 export function registerUser(data) {
-  return async function registerUserThunk(dispatch) {
+  return async (dispatch) => {
+    dispatch(setStatus(Status.LOADING));
     try {
-      const response = await axios.post("http://localhost:4000/api/auth/register", data);
-      console.log(response);
+      const response = await axios.post(
+        "http://localhost:4000/api/auth/register",
+        data
+      );
       if (response.status >= 200 && response.status < 300) {
+        // Registration successful, but do NOT set user/token here
         dispatch(setStatus(Status.SUCCESS));
-        dispatch(setUser(response.data.user)); // optional: if backend returns user data
-          dispatch(setError(null)); // clear previous errors
+        dispatch(setUser(null));
+        dispatch(setToken(null));
+        dispatch(setError(null));
       } else {
         dispatch(setStatus(Status.ERROR));
         dispatch(setError("Registration failed"));
       }
     } catch (error) {
       console.error("Registration error:", error);
-      const message = error.response?.data?.message || error.message || "Registration failed";
+      const message =
+        error.response?.data?.message || error.message || "Registration failed";
       dispatch(setStatus(Status.ERROR));
       dispatch(setError(message));
     }
   };
 }
 
-// Thunk to login a user
+// Thunk to login a user (set token + user on login)
 export function loginUser(data) {
-  return async function loginUserThunk(dispatch) {
+  return async (dispatch) => {
+    dispatch(setStatus(Status.LOADING));
     try {
-      const response = await axios.post("http://localhost:4000/api/auth/login", data);
-      console.log(response);
-      if (response.status === 201) {
-        dispatch(setStatus(Status.SUCCESS));
-        dispatch(setUser(response.data.user)); // optional
+      const response = await axios.post(
+        "http://localhost:4000/api/auth/login",
+        data
+      );
+      if (response.status >= 200 && response.status < 300) {
+        const { token, user } = response.data;
+        if (token) {
+          localStorage.setItem("tokenHoYo", token);
+          dispatch(setToken(token));
+          dispatch(setUser(user || null));
+          dispatch(setStatus(Status.SUCCESS));
+          dispatch(setError(null));
+        } else {
+          dispatch(setStatus(Status.ERROR));
+          dispatch(setError("No token returned"));
+        }
       } else {
         dispatch(setStatus(Status.ERROR));
+        dispatch(setError("Login failed"));
       }
     } catch (error) {
       console.error("Login error:", error);
+      const message =
+        error.response?.data?.message || error.message || "Login failed";
       dispatch(setStatus(Status.ERROR));
+      dispatch(setError(message));
     }
   };
 }

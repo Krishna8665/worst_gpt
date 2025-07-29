@@ -7,6 +7,7 @@ import Login from "./assets/pages/Login";
 import Price from "./assets/pages/Price";
 import store from "./assets/store/store";
 import { Provider } from "react-redux";
+import Navbar from "./assets/components/Navbar";
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
+      <Navbar/>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/home" element={<Home />} />

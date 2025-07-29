@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser, Status } from "../store/authSlice";
+import { registerUser, Status, resetStatus } from "../store/authSlice";
+import { Link } from "react-router-dom";
+
 
 export default function Signup() {
   const { status, error } = useSelector((store) => store.auth);
@@ -11,10 +13,10 @@ export default function Signup() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setData((prev) => ({
-      ...prev,
+    setData({
+      ...data,
       [name]: value,
-    }));
+    });
   };
 
   const handleSubmit = (e) => {
@@ -26,12 +28,13 @@ export default function Signup() {
     console.log("current status", status);
     if (status === Status.SUCCESS) {
       navigate("/login");
+      dispatch(resetStatus());
     }
     // Removed alert on error to show error from Redux state in UI
   }, [status, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 mt-8">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
           Sign up for WorstGPT
@@ -118,11 +121,10 @@ export default function Signup() {
 
         {/* Footer link */}
         <p className="text-sm text-center mt-6 text-gray-600">
-          Already have an account?{" "}
-          <a href="/login" className="text-blue-600 hover:underline">
-            Log in
-          </a>
+          Already have an account?
+          <Link to={"/login"} className="text-blue-600 hover:underline"> Log in</Link>
         </p>
+          
       </div>
     </div>
   );
