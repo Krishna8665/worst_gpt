@@ -36,27 +36,13 @@ export default function Login() {
     if (status === Status.SUCCESS) {
       navigate("/home");
     }
-    // Removed alert on error to show error from Redux state in UI
-  }, [status, navigate]);
-  //   try {
-  //     const res = await fetch("/api/auth/login", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(form),
-  //     });
+  }, [status, navigate, dispatch]);
 
-  //     const data = await res.json();
-
-  //     if (!res.ok) throw new Error(data.message || "Login failed");
-  //     navigate("/chat");
-  //   } catch (err) {
-  //     setError(err.message);
-  //   }
-  // };
-
-  // const handleGoogleLogin = () => {
-  //   window.location.href = "/api/auth/google";
-  // };
+  const handleGoogleLogin = () => {
+    window.location.href = `${
+      import.meta.env.VITE_BACKEND_URL
+    }/api/auth/google`;
+  };
 
   return (
     <>
@@ -124,17 +110,17 @@ export default function Login() {
             <span className="mx-2">or</span>
           </div>
 
-          {/* <button
-          onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded hover:bg-gray-50 transition text-gray-800 font-medium"
+          <button
+            onClick={handleGoogleLogin}
+            className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded hover:bg-gray-50 transition text-gray-800 font-medium"
           >
-          <FcGoogle size={20} />
-          <span>Log in with Google</span>
-          </button> */}
+            <FcGoogle size={20} />
+            <span>Log in with Google</span>
+          </button>
 
           <p className="text-sm text-center mt-6 text-gray-800">
             Don’t have an account?
-            <Link to={"/signup"} className="text-blue-600 hover:underline" >
+            <Link to={"/signup"} className="text-blue-600 hover:underline">
               Sign up
             </Link>
           </p>

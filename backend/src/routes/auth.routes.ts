@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
 // Google OAuth Routes
 router.get(
   "/google",
-  passport.authenticate("google", {
+  passport.authenticate("google", {//g
     scope: ["profile", "email"],
   })
 );
@@ -31,13 +31,25 @@ router.get("/profile", (req, res) => {
   const user = req.user as any;
   res.send(`Welcome Respected ${user.username}`);
 });
+
+//Handle callback
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
+  passport.authenticate("google", { session: false, failureRedirect: "/login" }),
   (req, res) => {
-    res.redirect("/api/auth/profile");
+    const user = req.user as any;
+    const jwt = require("jsonwebtoken");
+    const token = jwt.sign(
+      { email: user.email, _id: user._id },
+      process.env.JWT_SECRET!,
+      { expiresIn: "1h" }
+    );
+
+    // Redirect to frontend with token in query
+    res.redirect(`${process.env.CLIENT_URL}/google-redirect?token=${token}`);
   }
 );
+
 
 // Logout route (GET or POST)
 router.get("/logout", (req, res, next) => {

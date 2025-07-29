@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser, Status, resetStatus } from "../store/authSlice";
-import { Link } from "react-router-dom";
-
+import { FcGoogle } from "react-icons/fc";
 
 export default function Signup() {
   const { status, error } = useSelector((store) => store.auth);
@@ -24,31 +23,34 @@ export default function Signup() {
     dispatch(registerUser(data));
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${
+      import.meta.env.VITE_BACKEND_URL
+    }/api/auth/google`;
+  };
+
   useEffect(() => {
     console.log("current status", status);
     if (status === Status.SUCCESS) {
       navigate("/login");
       dispatch(resetStatus());
     }
-    // Removed alert on error to show error from Redux state in UI
-  }, [status, navigate]);
+  }, [status, navigate, dispatch]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 mt-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 mt-10">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
           Sign up for WorstGPT
         </h2>
 
-        {/* Show error message from Redux */}
         {status === Status.ERROR && error && (
           <div className="bg-red-100 text-red-600 p-3 mb-4 rounded text-sm">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5" method="POST">
-          {/* Username */}
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label
               htmlFor="username"
@@ -67,7 +69,6 @@ export default function Signup() {
             />
           </div>
 
-          {/* Email */}
           <div>
             <label
               htmlFor="email"
@@ -86,7 +87,6 @@ export default function Signup() {
             />
           </div>
 
-          {/* Password */}
           <div>
             <label
               htmlFor="password"
@@ -105,7 +105,6 @@ export default function Signup() {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
@@ -114,17 +113,25 @@ export default function Signup() {
           </button>
         </form>
 
-        {/* Or Divider */}
-        <div className="my-6 flex items-center justify-center text-sm text-gray-500">
+        <div className="my-2 flex items-center justify-center  text-sm text-gray-500">
           <span className="mx-2">— or —</span>
         </div>
 
-        {/* Footer link */}
-        <p className="text-sm text-center mt-6 text-gray-600">
+        {/* Google Sign Up Button */}
+        <button
+          onClick={handleGoogleLogin}
+          className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded hover:bg-gray-50 transition text-gray-800 font-medium"
+        >
+          <FcGoogle size={20} />
+          <span>Sign up with Google</span>
+        </button>
+
+        <p className="text-sm text-center  mt-3 text-gray-600">
           Already have an account?
-          <Link to={"/login"} className="text-blue-600 hover:underline"> Log in</Link>
+          <Link to={"/login"} className="text-blue-600 hover:underline">
+            Log in
+          </Link>
         </p>
-          
       </div>
     </div>
   );

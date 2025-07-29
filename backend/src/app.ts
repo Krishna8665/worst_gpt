@@ -13,7 +13,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173" ,
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -27,16 +27,15 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production", // Secure cookies in production
+      secure: false, // Secure cookies in production
+      httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     },
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
 app.use("/api", routes);
-
 app.use(globalErrorHandler);
 
 export default app;

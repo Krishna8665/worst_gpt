@@ -119,3 +119,29 @@ export function loginUser(data) {
     }
   };
 }
+
+// Fetch Google user after login
+export function fetchGoogleUser() {
+  return async (dispatch) => {
+    dispatch(setStatus(Status.LOADING));
+    try {
+      const response = await axios("http://localhost:4000/api/auth/google", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        dispatch(setUser(data.user));
+        dispatch(setStatus(Status.SUCCESS));
+      } else {
+        dispatch(setStatus(Status.ERROR));
+        dispatch(setError(data.message));
+      }
+    } catch (err) {
+      dispatch(setStatus(Status.ERROR));
+      dispatch(setError("Failed to fetch user"));
+    }
+  };
+}

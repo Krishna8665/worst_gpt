@@ -8,6 +8,7 @@ import Price from "./assets/pages/Price";
 import store from "./assets/store/store";
 import { Provider } from "react-redux";
 import Navbar from "./assets/components/Navbar";
+import GoogleRedirect from "./assets/pages/GoogleRedirect";
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/price" element={<Price />} />
+        <Route path="/google-redirect" element={<GoogleRedirect/>} />
       </Routes>
     </BrowserRouter>
     </Provider>
