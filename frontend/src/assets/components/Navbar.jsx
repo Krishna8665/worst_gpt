@@ -13,7 +13,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const checkLogin = () => {
-      const localStorageToken = localStorage.getItem("tokenHoYo");
+      const localStorageToken = localStorage.getItem("authToken");
       setIsLoggedIn(!!reduxToken || !!localStorageToken);
     };
 
@@ -25,7 +25,7 @@ export default function Navbar() {
   }, [reduxToken]);
 
   const handleLogout = () => {
-    localStorage.removeItem("tokenHoYo");
+    localStorage.removeItem("authToken");
     dispatch(logout());
     setIsLoggedIn(false);
     navigate("/"); // Redirect to homepage

@@ -40,19 +40,13 @@ const authSlice = createSlice({
       state.token = null;
       state.status = Status.IDLE;
       state.error = null;
-      localStorage.removeItem("tokenHoYo");
+      localStorage.removeItem("authToken");
     },
   },
 });
 
-export const {
-  setUser,
-  setToken,
-  setStatus,
-  setError,
-  resetStatus,
-  logout,
-} = authSlice.actions;
+export const { setUser, setToken, setStatus, setError, resetStatus, logout } =
+  authSlice.actions;
 
 export default authSlice.reducer;
 
@@ -97,7 +91,7 @@ export function loginUser(data) {
       if (response.status >= 200 && response.status < 300) {
         const { token, user } = response.data;
         if (token) {
-          localStorage.setItem("tokenHoYo", token);
+          localStorage.setItem("authToken", token);
           dispatch(setToken(token));
           dispatch(setUser(user || null));
           dispatch(setStatus(Status.SUCCESS));

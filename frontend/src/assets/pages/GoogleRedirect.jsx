@@ -15,7 +15,7 @@ export default function GoogleRedirect() {
       const token = urlParams.get("token");
 
       if (token) {
-        localStorage.setItem("tokenHoYo", token);
+        localStorage.setItem("authToken", token);
         dispatch(setToken(token));
         dispatch(setStatus(Status.SUCCESS));
 

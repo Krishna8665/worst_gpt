@@ -9,24 +9,30 @@ import store from "./assets/store/store";
 import { Provider } from "react-redux";
 import Navbar from "./assets/components/Navbar";
 import GoogleRedirect from "./assets/pages/GoogleRedirect";
+import ProtectedRoute from "./assets/data/ProtectedRoute";
 
 function App() {
-
-
   return (
     <Provider store={store}>
       <BrowserRouter>
-      <Navbar/>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/price" element={<Price />} />
-        <Route path="/google-redirect" element={<GoogleRedirect/>} />
-      </Routes>
-    </BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/price" element={<Price />} />
+          <Route path="/google-redirect" element={<GoogleRedirect />} />
+        </Routes>
+      </BrowserRouter>
     </Provider>
   );
 }
