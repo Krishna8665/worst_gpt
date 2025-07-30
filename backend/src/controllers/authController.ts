@@ -7,6 +7,11 @@ import dotenv from "dotenv";
 import envConfig from "../config/config";
 import { initUserUsage } from "../utils/initUserUsage";
 import { Types } from "mongoose";
+// controllers/auth/sendCode.ts
+import VerificationCode from "../models/VerificationCode";
+import nodemailer from "nodemailer";
+import { randomInt } from "crypto";
+import Usage from "../models/Usage";
 
 dotenv.config();
 
@@ -85,10 +90,10 @@ const login = async (req: Request, res: Response): Promise<any> => {
       sameSite: "strict", // Strict CSRF protection
     });
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "Login successful!",
       token,
-     });
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error, please try again." });
@@ -102,4 +107,82 @@ const logout = (req: Request, res: Response) => {
   res.status(200).json({ message: "Logged out successfully!" });
 };
 
-export { registerUser, login, logout };
+const sendVerificationCode = async (req: Request, res: Response) => {
+  let { email } = req.body;
+
+  if (!email.endsWith("@gmail.com")) {
+    return res
+      .status(400)
+      .json({ message: "Only Gmail addresses are allowed." });
+  }
+
+  email = email.trim().toLowerCase();
+
+  const code = randomInt(100000, 999999).toString();
+
+  await VerificationCode.findOneAndUpdate(
+    { email },
+    { code, createdAt: new Date() },
+    { upsert: true, new: true, runValidators: true }
+  );
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS, // Use Gmail App Password
+    },
+  });
+
+  await transporter.sendMail({
+    from: `"WorstGPT" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Your WorstGPT Verification Code",
+    html: `<h2>Your code is: <b>${code}</b></h2>`,
+  });
+
+  return res.status(200).json({ message: "Code sent" });
+};
+
+// controllers/auth/verifyAndRegister.ts
+
+const verifyAndRegister = async (req: Request, res: Response) => {
+  const { email, username, password, code } = req.body;
+
+  const record = await VerificationCode.findOne({ email });
+
+  if (!record || record.code !== code) {
+    return res
+      .status(400)
+      .json({ message: "Invalid or expired verification code." });
+  }
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.status(409).json({ message: "User already exists" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = await User.create({
+    username,
+    email,
+    password: hashedPassword,
+  });
+
+  const resetDate = new Date();
+  resetDate.setDate(resetDate.getDate() + 30);
+
+  await Usage.create({
+    userId: newUser._id,
+    credits: 100,
+    resetDate,
+    isPremium: false,
+  });
+
+  await VerificationCode.deleteOne({ email }); //code will be vanish from db after signup
+
+  return res.status(201).json({ message: "Signup successful" });
+};
+
+export { registerUser, login, logout, sendVerificationCode, verifyAndRegister };

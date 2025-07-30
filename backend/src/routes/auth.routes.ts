@@ -1,5 +1,11 @@
 import express from "express";
-import { login, logout, registerUser } from "../controllers/authController";
+import {
+  login,
+  logout,
+  registerUser,
+  sendVerificationCode,
+  verifyAndRegister,
+} from "../controllers/authController";
 import asyncHandler from "../utils/asyncHandler";
 import passport from "passport";
 
@@ -9,6 +15,8 @@ const router = express.Router();
 router.post("/register", asyncHandler(registerUser));
 router.post("/login", login);
 router.post("/logout", logout);
+router.post("/send-code", sendVerificationCode);
+router.post("/verify-and-register", verifyAndRegister);
 
 // Landing route (for testing)
 router.get("/", (req, res) => {
@@ -18,7 +26,8 @@ router.get("/", (req, res) => {
 // Google OAuth Routes
 router.get(
   "/google",
-  passport.authenticate("google", {//g
+  passport.authenticate("google", {
+    //g
     scope: ["profile", "email"],
   })
 );
@@ -35,7 +44,10 @@ router.get("/profile", (req, res) => {
 //Handle callback
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false, failureRedirect: "/login" }),
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: "/login",
+  }),
   (req, res) => {
     const user = req.user as any;
     const jwt = require("jsonwebtoken");
@@ -49,7 +61,6 @@ router.get(
     res.redirect(`${process.env.CLIENT_URL}/google-redirect?token=${token}`);
   }
 );
-
 
 // Logout route (GET or POST)
 router.get("/logout", (req, res, next) => {
