@@ -2,43 +2,41 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../store/authSlice"; // make sure logout action exists
+import { logout } from "../store/authSlice";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const reduxToken = useSelector((store) => store.auth.user?.token);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const token = useSelector((store) => store.auth.user?.token);
+  const credits = useSelector((store) => store.usage.credits);
+  const isPremium = useSelector((store) => store.usage.isPremium);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const checkLogin = () => {
-      const localStorageToken = localStorage.getItem("authToken");
-      setIsLoggedIn(!!reduxToken || !!localStorageToken);
-    };
-
-    checkLogin();
-
-    // Listen to localStorage changes from other tabs/windows
-    window.addEventListener("storage", checkLogin);
-    return () => window.removeEventListener("storage", checkLogin);
-  }, [reduxToken]);
+    setIsLoggedIn(!!token || !!localStorage.getItem("authToken"));
+  }, [token]);
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    dispatch(logout());
-    setIsLoggedIn(false);
-    navigate("/"); // Redirect to homepage
-  };
+  dispatch(logout());
+  localStorage.removeItem("authToken");
+  setIsLoggedIn(false);
+
+  // Delay navigation until Redux state has updated
+  setTimeout(() => {
+    navigate("/", { replace: true });
+  }, 50);
+};
+
+
+  const creditDisplay = isPremium ? "∞" : credits;
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
-        <Link to="/home" className="text-2xl font-bold text-gray-900">
-          WorstGPT
-        </Link>
+        <div className="text-2xl font-bold text-gray-900">WorstGPT</div>
 
-        {/* Desktop Links */}
         <div className="hidden md:flex items-center space-x-6 text-gray-700 text-sm font-medium">
           <Link to="/price" className="hover:text-blue-600 transition">
             Pricing
@@ -46,6 +44,18 @@ export default function Navbar() {
           <Link to="/about" className="hover:text-blue-600 transition">
             About
           </Link>
+
+          {/* Credit Badge */}
+          {isLoggedIn && (
+            <div
+              className="flex items-center px-2 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded-full"
+              title="Remaining Credits"
+            >
+              <span className="mr-1 text-green-600 text-sm font-bold">+</span>
+              {creditDisplay}
+            </div>
+          )}
+
           {!isLoggedIn ? (
             <>
               <Link to="/signup" className="hover:text-blue-600 transition">
@@ -65,7 +75,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="md:hidden p-2"
@@ -84,6 +93,18 @@ export default function Navbar() {
           <Link to="/about" className="block py-2 hover:text-blue-600">
             About
           </Link>
+
+          {/* Credit badge in mobile */}
+          {isLoggedIn && (
+            <div
+              className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full"
+              title="Remaining Credits"
+            >
+              <span className="mr-1 text-green-600 text-sm font-bold">+</span>
+              {creditDisplay}
+            </div>
+          )}
+
           {!isLoggedIn ? (
             <>
               <Link to="/signup" className="block py-2 hover:text-blue-600">

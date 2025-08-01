@@ -56,7 +56,7 @@ export function registerUser(data) {
     dispatch(setStatus(Status.LOADING));
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/auth/register",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/verify-and-register`,
         data
       );
       if (response.status >= 200 && response.status < 300) {

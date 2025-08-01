@@ -48,18 +48,29 @@ export const handleGptQuery = async (req: Request, res: Response) => {
     const deepseekResponse = await axios.post(
       "https://api.deepseek.com/beta/chat/completions",
       {
-        model: "deepseek-chat", // or deepseek-coder / deepseek-reasoner
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 1024,
+        model: "deepseek-chat",
+        messages: [
+          {
+            role: "system",
+            content: `You are WorstGPT, a sarcastic AI that gives short, witty, brutally mocking responses.
+Keep your replies between 4 to 10 lines . Always respond in a clever and humorous tone.`,
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        max_tokens: 200,
+        temperature: 1.7,
       },
-
       {
         headers: {
           Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
         },
       }
     );
-    console.log(deepseekResponse)
+
+    console.log(deepseekResponse);
 
     console.log("🔑 API Key:", process.env.DEEPSEEK_API_KEY);
     type DeepseekChatResponse = {
@@ -98,7 +109,7 @@ export const handleGptQuery = async (req: Request, res: Response) => {
     res.status(200).json({
       // response: sarcasticReply,
       response: completion,
-      tokensUsed: tokensUsed,
+      tokensUsed: usedTokens,
       remainingCredits: usage.isPremium ? "∞" : usage.credits,
     });
   } catch (error: any) {

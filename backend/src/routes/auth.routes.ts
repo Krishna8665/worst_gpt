@@ -1,3 +1,6 @@
+import { Request, Response } from "express";
+import Usage from "../models/Usage";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 import express from "express";
 import {
   login,
@@ -61,6 +64,8 @@ router.get(
     res.redirect(`${process.env.CLIENT_URL}/google-redirect?token=${token}`);
   }
 );
+
+
 
 // Logout route (GET or POST)
 router.get("/logout", (req, res, next) => {

@@ -1,19 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser, Status, resetStatus } from "../store/authSlice";
 
 export default function Signup() {
-  const [step, setStep] = useState(1); // 1 = enter email, 2 = verify code + signup
+  const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     email: "",
     username: "",
     password: "",
     code: "",
   });
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { status, error } = useSelector((state) => state.auth);
+
+  const [localMessage, setLocalMessage] = useState("");
+  const [localError, setLocalError] = useState("");
+
+  useEffect(() => {
+    if (status === Status.SUCCESS) {
+      setLocalMessage("Signup successful. Redirecting...");
+      setTimeout(() => navigate("/login"), 1500);
+    }
+  }, [status, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,41 +35,44 @@ export default function Signup() {
 
   const sendCode = async (e) => {
     e.preventDefault();
-    setError("");
-    setMessage("");
+    setLocalError("");
+    setLocalMessage("");
+    dispatch(resetStatus());
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/send-code`, {
-        email: form.email,
-      });
-      setMessage(res.data.message || "Verification code sent to your Gmail.");
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/send-code`,
+        { email: form.email }
+      );
+      setLocalMessage(
+        res.data.message || "Verification code sent to your Gmail."
+      );
       setStep(2);
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to send code.");
+      setLocalError(err?.response?.data?.message || "Failed to send code.");
     }
   };
 
-  const verifyAndRegister = async (e) => {
+  const verifyAndRegister = (e) => {
     e.preventDefault();
-    setError("");
-    setMessage("");
+    setLocalError("");
+    setLocalMessage("");
+    dispatch(resetStatus());
 
-    try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/verify-and-register`, {
-        email: form.email,
-        username: form.username,
-        password: form.password,
-        code: form.code,
-      });
-      setMessage("Signup successful. Redirecting...");
-      setTimeout(() => navigate("/login"), 1500);
-    } catch (err) {
-      setError(err?.response?.data?.message || "Signup failed.");
-    }
+    const data = {
+      email: form.email,
+      username: form.username,
+      password: form.password,
+      code: form.code,
+    };
+
+    dispatch(registerUser(data));
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/auth/google`;
+    window.location.href = `${
+      import.meta.env.VITE_BACKEND_URL
+    }/api/auth/google`;
   };
 
   return (
@@ -66,23 +82,28 @@ export default function Signup() {
           Sign up with Gmail
         </h2>
 
-        {error && (
+        {(localError || error) && (
           <div className="bg-red-100 text-red-600 p-3 mb-4 rounded text-sm">
-            {error}
+            {localError || error}
           </div>
         )}
 
-        {message && (
+        {localMessage && (
           <div className="bg-green-100 text-green-700 p-3 mb-4 rounded text-sm">
-            {message}
+            {localMessage}
           </div>
         )}
 
-        <form onSubmit={step === 1 ? sendCode : verifyAndRegister} className="space-y-5">
-          {/* Step 1: Enter email */}
+        <form
+          onSubmit={step === 1 ? sendCode : verifyAndRegister}
+          className="space-y-5"
+        >
           {step === 1 && (
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Gmail Address
               </label>
               <input
@@ -103,11 +124,13 @@ export default function Signup() {
             </div>
           )}
 
-          {/* Step 2: Complete registration */}
           {step === 2 && (
             <>
               <div>
-                <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="code"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Verification Code
                 </label>
                 <input
@@ -121,7 +144,10 @@ export default function Signup() {
               </div>
 
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Username
                 </label>
                 <input
@@ -135,7 +161,10 @@ export default function Signup() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Password
                 </label>
                 <input
@@ -159,11 +188,10 @@ export default function Signup() {
           )}
         </form>
 
-        <div className="my-2 flex items-center justify-center  text-sm text-gray-500">
+        <div className="my-2 flex items-center justify-center text-sm text-gray-500">
           <span className="mx-2">— or —</span>
         </div>
 
-        {/* Google Sign Up Button */}
         <button
           onClick={handleGoogleLogin}
           className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded hover:bg-gray-50 transition text-gray-800 font-medium"

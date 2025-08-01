@@ -1,36 +1,60 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowUp, Search } from "lucide-react";
 import Navbar from "../components/Navbar";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
-  const [messages, setMessages] = useState([]);
+  const navigate = useNavigate();
+  const reduxToken = useSelector((state) => state.auth.token);
+  const token = reduxToken || localStorage.getItem("authToken");
+
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
-    setIsLoading(true);
-    setMessages((prev) => [...prev, { from: "user", text: input }]);
-    setInput("");
+    const userMessage = { sender: "user", text: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setLoading(true);
+    setError("");
 
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { from: "bot", text: generateResponse(input) },
-      ]);
-      setIsLoading(false);
-    }, 1000);
-  };
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/gpt/gpt",
+        { prompt: input },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
 
-  const generateResponse = (query) => {
-    // Simulate a more comprehensive search-like response
-    return `Here’s your nonsense on "${query}":\n\n1.  ${query}\n2.  ${query}\n3.  ${query}`;
+      const { response: botText } = response.data;
+
+      setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "Something went wrong. Try again later.";
+      setError(message);
+    } finally {
+      setLoading(false);
+      setInput("");
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -59,17 +83,17 @@ export default function Home() {
 
         {hasMessages && (
           <div className="space-y-6 mb-8">
-            {messages.map((msg, i) => (
+            {messages.map((input, i) => (
               <div
                 key={i}
                 className={`rounded-lg p-4 ${
-                  msg.from === "user"
+                  input.sender === "user"
                     ? "bg-blue-50 text-blue-900"
                     : "bg-white border border-gray-200"
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  {msg.from === "user" ? (
+                  {input.sender === "user" ? (
                     <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
                       Y
                     </div>
@@ -80,20 +104,20 @@ export default function Home() {
                   )}
                   <div className="flex-1">
                     <div className="font-medium mb-1">
-                      {msg.from === "user" ? "You" : "WorstGPT"}
+                      {input.sender === "user" ? "You" : "WorstGPT"}
                     </div>
-                    <div className="whitespace-pre-wrap">{msg.text}</div>
+                    <div className="whitespace-pre-wrap">{input.text}</div>
                   </div>
                 </div>
               </div>
             ))}
-            {isLoading && (
+            {loading && (
               <div className="rounded-lg p-4 bg-white border border-gray-200">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
                     D
                   </div>
-                  <div className="font-medium">Worstgpt is thinking...</div>
+                  <div className="font-medium">WorstGPT is thinking...</div>
                 </div>
               </div>
             )}
@@ -123,7 +147,7 @@ export default function Home() {
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition disabled:opacity-50"
                 aria-label="Send"
-                disabled={!input.trim() || isLoading}
+                disabled={!input.trim() || loading}
               >
                 <ArrowUp size={20} />
               </button>
