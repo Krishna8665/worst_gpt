@@ -10,7 +10,7 @@ dotenv.config();
 
 export const handleGptQuery = async (req: Request, res: Response) => {
   try {
-    console.log("🔥 GPT route hit");
+    console.log(" GPT route hit");
     console.log("User:", req.user);
     console.log("Body:", req.body);
 
