@@ -31,7 +31,7 @@ export default function LandingPage() {
         </h2>
         <div className="grid md:grid-cols-3 gap-12 text-left text-gray-800">
           <div>
-            <h3 className="text-xl font-semibold mb-3">
+            <h3 className="text-2xl font-semibold mb-3">
               Painfully Honest Replies
             </h3>
             <p>
@@ -40,14 +40,14 @@ export default function LandingPage() {
             </p>
           </div>
           <div>
-            <h3 className="text-xl font-semibold mb-3">Daily Limit? Good.</h3>
+            <h3 className="text-2xl font-semibold mb-3">Daily Limit? Good.</h3>
             <p>
               You get 10 messages per day. Because you probably can't handle
               more.
             </p>
           </div>
           <div>
-            <h3 className="text-xl font-semibold mb-3">Premium Mockery</h3>
+            <h3 className="text-2xl font-semibold mb-3">Premium Mockery</h3>
             <p>
               Pay monthly to get insulted more frequently. Worth every penny.
             </p>
@@ -61,15 +61,15 @@ export default function LandingPage() {
           Users Hate It (Which Means It Works)
         </h2>
         <div className="grid md:grid-cols-3 gap-8 text-gray-700">
-          <div className="bg-gray-100 p-6 rounded shadow">
+          <div className="font-bold  bg-gray-100 p-6 rounded shadow">
             <p>“WorstGPT made me question all my life choices. 10/10.”</p>
             <p className="mt-4 text-sm text-gray-500">— An Anonymous Wreck</p>
           </div>
-          <div className="bg-gray-100 p-6 rounded shadow">
+          <div className="font-bold  bg-gray-100 p-6 rounded shadow">
             <p>“It roasted me harder than my ex. Subscribed immediately.”</p>
             <p className="mt-4 text-sm text-gray-500">— Probably Crying</p>
           </div>
-          <div className="bg-gray-100 p-6 rounded shadow">
+          <div className="font-bold  bg-gray-100 p-6 rounded shadow">
             <p>“Horribly accurate responses. I feel attacked. I love it.”</p>
             <p className="mt-4 text-sm text-gray-500">— Therapy Patient #242</p>
           </div>

@@ -19,16 +19,15 @@ export default function Navbar() {
   }, [token]);
 
   const handleLogout = () => {
-  dispatch(logout());
-  localStorage.removeItem("authToken");
-  setIsLoggedIn(false);
+    dispatch(logout());
+    localStorage.removeItem("authToken");
+    setIsLoggedIn(false);
 
-  // Delay navigation until Redux state has updated
-  setTimeout(() => {
-    navigate("/", { replace: true });
-  }, 50);
-};
-
+    // Delay navigation until Redux state has updated
+    setTimeout(() => {
+      navigate("/home", { replace: true });
+    }, 5000);
+  };
 
   const creditDisplay = isPremium ? "∞" : credits;
 
